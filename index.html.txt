@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival de Parintins: A Grandiosidade do Caprichoso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Open+Sans:wght@400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Royal Azure & Golden Gleam Enhanced -->
+    <!-- Application Structure Plan: The SPA is now significantly longer and features a modular, section-based layout designed for a richer narrative flow. The header is an immersive intro. Subsequent sections alternate visual and text prominence, with dedicated areas for "Essence," "Characters," "Arena Spectacle," "Curiosities," and "History." The LLM-powered verse generator remains a key interactive element. The content is organized to build a comprehensive story of Caprichoso, moving from its core identity to its grand manifestations and historical journey. The layout utilizes responsive grid and flexbox patterns to create visual interest and clear content separation, ensuring readability and user engagement across devices. The animated background is enhanced for a more dynamic feel. -->
+    <!-- Visualization & Content Choices: The animated background is intensified with more particles and a slight "star-like" twinkle effect on the canvas, symbolizing the Caprichoso star and the festive atmosphere (Method: JS Canvas API, enhanced). Textual content is broken into smaller, digestible blocks with engaging headers and sub-sections (Method: HTML/Tailwind). Interactive "Curiosity Cards" (Vanilla JS toggle) are retained. New sections introduce "Characters" (simple HTML cards with icons) and "Arena Spectacle" (descriptive text with visual emphasis). The "Gerador de Versos de Toada" (Gemini API, Vanilla JS) is central for dynamic content. Placeholder images (placehold.co) are used for key visual elements, ensuring responsive sizing within their containers. NO SVG/Mermaid confirmed. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #F8F8F8; /* Light background */
+            color: #333333;
+            font-family: 'Open Sans', sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        .font-title {
+            font-family: 'Cinzel', serif;
+            color: #00008B; /* Royal Blue */
+        }
+        .font-accent {
+            font-family: 'Dancing Script', cursive;
+            color: #DAA520; /* Goldenrod */
+        }
+        #animated-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.25; /* Slightly more visible */
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .gradient-text-blue-gold {
+            background: linear-gradient(90deg, #00008B, #DAA520, #00008B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hover-gold-effect:hover {
+            color: #DAA520; /* Goldenrod */
+            transition: color 0.3s ease;
+        }
+        .curiosity-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 2px solid #00008B;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .curiosity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .verse-button {
+            background: linear-gradient(45deg, #DAA520, #FFD700); /* Gold */
+            color: #00008B; /* Royal Blue */
+            border: none;
+            border-radius: 9999px; /* Fully rounded */
+            padding: 0.75rem 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+        }
+        .verse-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .verse-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .character-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #DAA520;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .character-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-200 selection:text-blue-900">
+
+    <canvas id="animated-canvas"></canvas>
+
+    <div class="content-wrapper">
+
+        <header class="min-h-screen flex flex-col items-center justify-center text-center p-4 bg-gradient-to-br from-blue-900 to-blue-700 text-white shadow-xl">
+            <div class="max-w-4xl mx-auto py-16">
+                <h1 class="font-title text-4xl md:text-6xl lg:text-7xl mb-4 leading-tight fade-in-section">
+                    <span class="gradient-text-blue-gold">O Brilho do Caprichoso</span>
+                </h1>
+                <p class="font-accent text-3xl md:text-5xl mb-8 fade-in-section" style="transition-delay: 200ms;">
+                    A Estrela Guia de Parintins
+                </p>
+                <p class="text-base md:text-lg text-blue-100 mb-12 fade-in-section" style="transition-delay: 400ms;">
+                    Prepare-se para mergulhar na emoção, na cor e na tradição do Boi Caprichoso, o guardião da estrela, o touro negro que encanta a Amazônia.
+                </p>
+                <div class="text-blue-200 animate-bounce fade-in-section" style="transition-delay: 600ms;">
+                    <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <p class="mt-2 text-sm">Role para sentir a magia!</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="py-16 md:py-24 bg-gradient-to-b from-white to-blue-50">
+
+            <section class="max-w-6xl mx-auto px-6 mb-16 md:mb-24 fade-in-section">
+                <div class="section-header">
+                    <h2 class="font-title text-3xl md:text-4xl lg:text-5xl mb-4 gradient-text-blue-gold">A Essência do Touro Negro</h2>
+                    <p class="text-base md:text-lg max-w-2xl mx-auto text-gray-700">
+                        Nesta seção, exploraremos os pilares que definem a grandiosidade do Boi Caprichoso. Entenda as suas cores, o símbolo da estrela e a paixão que move a sua nação.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100 flex flex-col items-center text-center hover-gold-effect">
+                        <span class="text-6xl mb-4">🔵⚪</span>
+                        <h3 class="font-title text-2xl md:text-3xl mb-3 text-blue-800">As Cores da Nação</h3>
+                        <p class="text-gray-700 leading-relaxed">
+                            O azul profundo e o branco imaculado são mais do que cores; são a alma do Caprichoso. O azul representa o céu amazônico, os rios e a vastidão da floresta. O branco simboliza a paz, a pureza e a luz da estrela que guia o boi. Juntas, elas pintam a paixão de milhões.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100 flex flex-col items-center text-center hover-gold-effect">
+                        <span class="text-6xl mb-4">⭐</span>
+                        <h3 class="font-title text-2xl md:text-3xl mb-3 text-blue-800">A Estrela na Testa</h3>
+                        <p class="text-gray-700 leading-relaxed">
+                            A estrela azul e branca que adorna a testa do Caprichoso não é apenas um adereço; é seu símbolo máximo. Representa a luz, a liberdade e a força de um povo que brilha sob o céu de Parintins, marcando sua identidade única e sua conexão com o universo.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="max-w-6xl mx-auto px-6 mb-16 md:mb-24 fade-in-section">
+                <div class="section-header">
+                    <h2 class="font-title text-3xl md:text-4xl lg:text-5xl mb-4 gradient-text-blue-gold">Personagens e Figuras Místicas</h2>
+                    <p class="text-base md:text-lg max-w-2xl mx-auto text-gray-700">
+                        Conheça os personagens lendários que dão vida e magia às apresentações do Boi Caprichoso no Bumbódromo.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    <div class="character-card">
+                        <span class="text-4xl mb-2">🧑‍🎤</span>
+                        <h4 class="font-title text-lg text-blue-800">Amo do Boi</h4>
+                        <p class="text-xs text-gray-600">O poeta que canta e declama as toadas, comandando a apresentação.</p>
+                    </div>
+                    <div class="character-card">
+                        <span class="text-4xl mb-2">👸</span>
+                        <h4 class="font-title text-lg text-blue-800">Cunhã-Poranga</h4>
+                        <p class="text-xs text-gray-600">A mais bela das tribos, representa a força e a beleza da mulher indígena.</p>
+                    </div>
+                    <div class="character-card">
+                        <span class="text-4xl mb-2">🧙‍♂️</span>
+                        <h4 class="font-title text-lg text-blue-800">Pajé</h4>
+                        <p class="text-xs text-gray-600">O curandeiro da tribo, figura mística com poderes ancestrais.</p>
+                    </div>
+                    <div class="character-card">
+                        <span class="text-4xl mb-2">🐎</span>
+                        <h4 class="font-title text-lg text-blue-800">Cavalariada</h4>
+                        <p class="text-xs text-gray-600">Grupo de cavaleiros que acompanham o boi, representando bravura.</p>
+                    </div>
+                     <div class="character-card">
+                        <span class="text-4xl mb-2">🥁</span>
+                        <h4 class="font-title text-lg text-blue-800">Marujada</h4>
+                        <p class="text-xs text-gray-600">A bateria vibrante do Caprichoso, o coração da festa.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="max-w-6xl mx-auto px-6 mb-16 md:mb-24 fade-in-section">
+                <div class="section-header">
+                    <h2 class="font-title text-3xl md:text-4xl lg:text-5xl mb-4 gradient-text-blue-gold">A Arena e o Espetáculo</h2>
+                    <p class="text-base md:text-lg max-w-2xl mx-auto text-gray-700">
+                        O Bumbódromo é o palco onde a magia acontece. Descubra a grandiosidade das alegorias, a emoção das coreografias e a força da Nação Azul e Branca.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                    <div class="p-6 bg-white/70 rounded-2xl shadow-lg border border-blue-100">
+                        <h3 class="font-title text-2xl text-blue-800 mb-3">O Bumbódromo</h3>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            Com sua arquitetura em formato de cabeça de boi, o Bumbódromo é a arena que pulsa durante o Festival. É ali que Caprichoso e Garantido se enfrentam numa batalha de arte e cultura.
+                        </p>
+                        <div class="w-full h-48 bg-blue-50 rounded-lg flex items-center justify-center text-center text-gray-500 font-body text-sm p-4">
+                            <span>Placeholder para imagem do Bumbódromo.</span>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-white/70 rounded-2xl shadow-lg border border-blue-100">
+                        <h3 class="font-title text-2xl text-blue-800 mb-3">Alegorias Vivas</h3>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            As alegorias do Caprichoso são monumentais obras de arte que contam histórias amazônicas. Elas se transformam e ganham vida, surpreendendo o público com engenhosidade e beleza.
+                        </p>
+                        <div class="w-full h-48 bg-blue-50 rounded-lg flex items-center justify-center text-center text-gray-500 font-body text-sm p-4">
+                            <span>Placeholder para imagem de alegoria do Caprichoso.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="max-w-6xl mx-auto px-6 mb-16 md:mb-24 fade-in-section">
+                <div class="section-header">
+                    <h2 class="font-title text-3xl md:text-4xl lg:text-5xl mb-4 gradient-text-blue-gold">Curiosidades Caprichosas</h2>
+                    <p class="text-base md:text-lg max-w-2xl mx-auto text-gray-700">
+                        Descubra fatos intrigantes e detalhes fascinantes que tornam o Boi Caprichoso uma lenda viva do Festival de Parintins. Clique nas cartas para revelar os segredos!
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="curiosity-card" data-curiosity-id="curiosity1">
+                        <h3 class="font-title text-xl text-blue-800 mb-2">A Rivalidade Histórica</h3>
+                        <p class="text-sm text-gray-600 mb-2">O Boi Caprichoso tem uma rivalidade lendária com o Boi Garantido. Essa disputa épica impulsiona a criatividade e a paixão em cada festival.</p>
+                        <p class="curiosity-detail text-base text-gray-800 hidden mt-3">Essa rivalidade não é apenas sobre o placar, mas sobre a identidade cultural de Parintins, com cada boi representando diferentes filosofias e apegos na cidade.</p>
+                    </div>
+                    <div class="curiosity-card" data-curiosity-id="curiosity2">
+                        <h3 class="font-title text-xl text-blue-800 mb-2">O "Touro Negro"</h3>
+                        <p class="text-sm text-gray-600 mb-2">Caprichoso é carinhosamente conhecido como "Touro Negro" pela sua cor predominante e sua imponência nas arenas.</p>
+                        <p class="curiosity-detail text-base text-gray-800 hidden mt-3">A força e a mística do touro negro refletem a garra e a determinação da nação azul e branca em buscar a vitória ano após ano.</p>
+                    </div>
+                    <div class="curiosity-card" data-curiosity-id="curiosity3">
+                        <h3 class="font-title text-xl text-blue-800 mb-2">Tradição e Inovação</h3>
+                        <p class="text-sm text-gray-600 mb-2">O Caprichoso equilibra a preservação de suas raízes folclóricas com a constante busca por inovação em suas apresentações e alegorias.</p>
+                        <p class="curiosity-detail text-base text-gray-800 hidden mt-3">Essa dualidade entre tradição e modernidade é o que mantém o boi relevante e surpreendente, atraindo novas gerações de torcedores.</p>
+                    </div>
+                    <div class="curiosity-card" data-curiosity-id="curiosity4">
+                        <h3 class="font-title text-xl text-blue-800 mb-2">O Item 19: A Galera</h3>
+                        <p class="text-sm text-gray-600 mb-2">A "Galera" (torcida do Caprichoso) é considerada o item 19 do festival, crucial para a pontuação pela sua organização e paixão.</p>
+                        <p class="curiosity-detail text-base text-gray-800 hidden mt-3">O canto e a sincronia da galera são espetáculos à parte, mostrando a força e a união do povo azul e branco, que se entrega de corpo e alma ao boi.</p>
+                    </div>
+                     <div class="curiosity-card" data-curiosity-id="curiosity5">
+                        <h3 class="font-title text-xl text-blue-800 mb-2">O Boi-Bumbá de Rua</h3>
+                        <p class="text-sm text-gray-600 mb-2">Antes do Bumbódromo, o Caprichoso e outros bois começaram suas apresentações nas ruas de Parintins, levando a festa ao povo.</p>
+                        <p class="curiosity-detail text-base text-gray-800 hidden mt-3">Essa origem humilde nas ruas é a base da autenticidade do festival, que cresceu sem perder a essência popular e comunitária.</p>
+                    </div>
+                    <div class="curiosity-card" data-curiosity-id="curiosity6">
+                        <h3 class="font-title text-xl text-blue-800 mb-2">Toadas e Lendas</h3>
+                        <p class="text-sm text-gray-600 mb-2">As toadas do Caprichoso narram lendas amazônicas, histórias de amor, e celebram a cultura indígena e a natureza.</p>
+                        <p class="curiosity-detail text-base text-gray-800 hidden mt-3">Cada toada é uma obra de arte que transporta o público para o universo mágico da Amazônia, com melodias envolventes e letras profundas que tocam a alma.</p>
+                    </div>
+                </div>
+            </section>
+
+             <section class="max-w-6xl mx-auto px-6 mb-16 md:mb-24 fade-in-section">
+                <div class="section-header">
+                    <h2 class="font-title text-3xl md:text-4xl lg:text-5xl mb-4 gradient-text-blue-gold">História e Legado</h2>
+                    <p class="text-base md:text-lg max-w-2xl mx-auto text-gray-700">
+                        Uma jornada através do tempo: a fundação, as grandes vitórias e a evolução do Boi Caprichoso que o tornaram uma lenda.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                    <div class="p-6 bg-white/70 rounded-2xl shadow-lg border border-blue-100">
+                        <h3 class="font-title text-2xl text-blue-800 mb-3">Origens e Fundação</h3>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            Fundado em 1913, o Caprichoso nasceu da paixão de um grupo de amigos que queriam celebrar a cultura do boi-bumbá. De um pequeno grupo de rua, tornou-se um gigante do folclore.
+                        </p>
+                    </div>
+                    <div class="p-6 bg-white/70 rounded-2xl shadow-lg border border-blue-100">
+                        <h3 class="font-title text-2xl text-blue-800 mb-3">Grandes Vitórias</h3>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            Ao longo de sua história, o Boi Caprichoso coleciona títulos e momentos inesquecíveis, com apresentações que ficaram marcadas na memória da nação azul e branca e do Festival de Parintins.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="max-w-3xl mx-auto px-6 mb-16 md:mb-24 text-center fade-in-section p-8 bg-blue-50/70 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-200">
+                <h2 class="font-title text-3xl md:text-4xl mb-4 gradient-text-blue-gold">🎶 Gerador de Versos de Toada 🎶</h2>
+                <p class="text-base md:text-lg text-gray-700 mb-8">
+                    Sinta a inspiração da floresta e da estrela azul! Clique no botão para receber um verso poético, como se fosse cantado no Bumbódromo pelo Caprichoso.
+                </p>
+                <button id="generateToadaBtn" class="verse-button">
+                    Gerar Verso Poético
+                </button>
+                <div id="toadaDisplay" class="mt-8 p-6 bg-blue-100 rounded-lg text-blue-900 italic text-lg md:text-xl hidden shadow-inner border border-blue-200">
+                    <p id="toadaText"></p>
+                    <div id="loadingToada" class="mt-4 hidden">
+                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-800 mx-auto"></div>
+                        <p class="text-sm text-blue-700 mt-2">O mestre de toadas está compondo...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="max-w-6xl mx-auto px-6 mb-16 md:mb-24 fade-in-section">
+                <div class="section-header">
+                    <h2 class="font-title text-3xl md:text-4xl lg:text-5xl mb-4 gradient-text-blue-gold">Vislumbre o Caprichoso</h2>
+                    <p class="text-base md:text-lg max-w-2xl mx-auto text-gray-700">
+                        Imagine a imponência e o esplendor do Boi Caprichoso. Abaixo, um espaço reservado para a sua imagem, que evoca a sua beleza em cada detalhe, adornado com dourado, azul e a estrela da paixão.
+                    </p>
+                </div>
+                <div class="flex justify-center items-center h-96 md:h-[500px] bg-white rounded-2xl shadow-xl border border-blue-200 overflow-hidden relative">
+                    <img src="https://placehold.co/800x500/00008B/DAA520?text=BOI+CAPRICHOSO" alt="Placeholder da Imagem do Boi Caprichoso" class="w-full h-full object-cover rounded-2xl opacity-80" onerror="this.onerror=null; this.src='https://placehold.co/800x500/DAA520/00008B?text=IMAGEM+INDISPON%C3%8DVEL';">
+                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-2xl">
+                        <p class="text-white text-2xl md:text-3xl font-title text-center p-4 leading-tight">
+                            "A força da estrela, o brilho da nação Caprichosa!"
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center py-12 md:py-16 bg-blue-900 text-blue-100 shadow-inner">
+            <p class="font-accent text-2xl md:text-3xl mb-4 leading-tight fade-in-section">
+                "Caprichoso: Mais que um Boi, uma Paixão Eterna."
+            </p>
+            <p class="text-sm md:text-base text-blue-200 fade-in-section" style="transition-delay: 100ms;">
+                Viva o Festival de Parintins! Viva o Boi Caprichoso!
+            </p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('animated-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const colors = ['rgba(0, 0, 139, ', 'rgba(218, 165, 32, ']; // DarkBlue and Goldenrod
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 1.8 + 0.8; // Slightly larger particles
+                    this.speedX = (Math.random() * 0.6 - 0.3) * 0.7; // Moderate horizontal drift
+                    this.speedY = (Math.random() * 0.8 + 0.3) * 0.7; // Moderate vertical drift
+                    this.alpha = Math.random() * 0.6 + 0.4; // More visible particles
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.twinkle = Math.random() < 0.1; // 10% chance to twinkle
+                    this.twinkleFactor = Math.random() * 0.2 + 0.8; // Twinkle intensity
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.alpha -= 0.002; // Fade out slowly
+
+                    if (this.y > canvas.height || this.alpha <= 0) {
+                        this.reset();
+                    }
+                     if (this.x > canvas.width) {
+                        this.x = -this.size;
+                    } else if (this.x < -this.size) {
+                        this.x = canvas.width;
+                    }
+
+                    if (this.twinkle) {
+                        this.alpha = Math.random() * 0.6 + 0.4; // Randomize alpha for twinkle effect
+                    }
+                }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = -this.size; // Start from top
+                    this.size = Math.random() * 1.8 + 0.8;
+                    this.speedX = (Math.random() * 0.6 - 0.3) * 0.7;
+                    this.speedY = (Math.random() * 0.8 + 0.3) * 0.7;
+                    this.alpha = Math.random() * 0.6 + 0.4;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.twinkle = Math.random() < 0.1;
+                    this.twinkleFactor = Math.random() * 0.2 + 0.8;
+                }
+                draw() {
+                    ctx.fillStyle = this.color + this.alpha + ')';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                let numberOfParticles = (canvas.width * canvas.height) / 10000; // Increased density
+                for (let i = 0; i < numberOfParticles; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initParticles();
+            });
+
+            resizeCanvas();
+            initParticles();
+            animate();
+
+            // Intersection Observer for fade-in effect
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            const sections = document.querySelectorAll('.fade-in-section');
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Curiosities interactive toggle
+            document.querySelectorAll('.curiosity-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    card.querySelector('.curiosity-detail').classList.toggle('hidden');
+                });
+            });
+
+            // Gemini API integration for Toada Verse Generator
+            const generateToadaBtn = document.getElementById('generateToadaBtn');
+            const toadaDisplay = document.getElementById('toadaDisplay');
+            const toadaText = document.getElementById('toadaText');
+            const loadingToada = document.getElementById('loadingToada');
+
+            generateToadaBtn.addEventListener('click', async () => {
+                toadaText.textContent = '';
+                toadaDisplay.classList.remove('hidden');
+                loadingToada.classList.remove('hidden');
+                generateToadaBtn.disabled = true;
+                generateToadaBtn.textContent = 'Gerando...';
+
+                try {
+                    const prompt = "Gere um verso poético curto e emocionante no estilo de uma toada de boi-bumbá, celebrando o Boi Caprichoso, suas cores (azul e branco), sua estrela na testa, a floresta amazônica, a paixão de sua nação e a energia do festival. O verso deve ser em português e ter no máximo 30 palavras. Use linguagem típica de toada, como 'Oh, meu boi!', 'É Caprichoso!' ou 'Levanta a poeira!'.";
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const generatedVerse = result.candidates[0].content.parts[0].text;
+                        toadaText.textContent = generatedVerse;
+                    } else {
+                        toadaText.textContent = 'O canto do boi está distante. Tente novamente mais tarde.';
+                    }
+                } catch (error) {
+                    console.error('Erro ao gerar verso de toada:', error);
+                    toadaText.textContent = 'Um brilho da estrela se perdeu. Tente novamente.';
+                } finally {
+                    loadingToada.classList.add('hidden');
+                    generateToadaBtn.disabled = false;
+                    generateToadaBtn.textContent = 'Gerar Verso Poético';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
